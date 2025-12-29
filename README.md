@@ -6,6 +6,7 @@ A zero-configuration security scanner for React Native and Expo applications tha
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![GitHub Issues](https://img.shields.io/github/issues/adnxy/rnsec.svg)](https://github.com/adnxy/rnsec/issues)
 [![GitHub Stars](https://img.shields.io/github/stars/adnxy/rnsec.svg)](https://github.com/adnxy/rnsec/stargazers)
+[![GitHub Sponsors](https://img.shields.io/github/sponsors/adnxy?style=flat&logo=github)](https://github.com/sponsors/adnxy)
 
 ---
 
@@ -405,6 +406,18 @@ For production applications handling sensitive data, we strongly recommend profe
 - **Email**: adnanpoviolabs@gmail.com
 - **Issues**: [GitHub Issues](https://github.com/adnxy/rnsec/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/adnxy/rnsec/discussions)
+
+### Support This Project
+
+If rnsec helps secure your React Native apps, consider supporting its development:
+
+[![GitHub Sponsors](https://img.shields.io/badge/Sponsor-GitHub-ea4aaa?style=for-the-badge&logo=github)](https://github.com/sponsors/adnxy)
+
+Your sponsorship helps:
+- Maintain and improve rnsec
+- Add new security rules and features
+- Provide faster support and bug fixes
+- Keep the project free and open source
 
 ### Report Security Vulnerabilities
 
