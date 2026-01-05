@@ -52,9 +52,18 @@ export class HtmlReporter {
   }
 
   private buildBodyContent(result: ScanResult, high: Finding[], medium: Finding[], low: Finding[]): string {
-    const { findings } = result;
+    const { findings, ignoredRules } = result;
 
-    return `<div class="scan-status">
+    const ignoredRulesSection = ignoredRules && ignoredRules.length > 0 ? `
+    <div class="ignored-rules">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      <span>Ignoring ${ignoredRules.length} rule(s): ${ignoredRules.join(', ')}</span>
+    </div>
+    ` : '';
+
+    return `${ignoredRulesSection}<div class="scan-status">
       <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
       </svg>

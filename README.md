@@ -112,6 +112,25 @@ Options:
 - `0` - No high-severity issues found
 - `1` - High-severity security issues detected
 
+## Configuration
+
+rnsec supports configuration files to customize the scanning behavior. Create a `.rnsec.jsonc` or `.rnsec.json` file in your project root.
+
+### Ignoring Rules
+
+You can ignore specific rules by adding them to the `ignoredRules` array:
+
+```jsonc
+{
+  "ignoredRules": [
+    "ASYNCSTORAGE_SENSITIVE_KEY",
+    "LOGGING_SENSITIVE_DATA"
+  ]
+}
+```
+
+To find the rule ID for a specific finding, check the `ruleId` field in the JSON output or HTML report.
+
 ## What It Detects
 
 rnsec identifies 63 different security issues across 13 categories:

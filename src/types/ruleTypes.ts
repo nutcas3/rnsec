@@ -31,3 +31,8 @@ export interface RuleGroup {
   rules: Rule[];
 }
 
+export interface RnsecConfig {
+  ignoredRules?: string[];
+  // Future: other config options
+}
+

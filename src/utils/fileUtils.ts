@@ -1,5 +1,6 @@
 import { readFile } from 'fs/promises';
 import { resolve } from 'path';
+import type { RnsecConfig } from '../types/ruleTypes.js';
 
 export async function readFileContent(filePath: string): Promise<string> {
   try {
@@ -8,6 +9,23 @@ export async function readFileContent(filePath: string): Promise<string> {
   } catch (error) {
     throw new Error(`Failed to read file ${filePath}: ${error}`);
   }
+}
+
+export async function readRnsecConfig(rootDir: string): Promise<RnsecConfig | null> {
+  const configPaths = ['.rnsec.json', '.rnsec.jsonc', '.rnsec.config.json'];
+
+  for (const configPath of configPaths) {
+    try {
+      const fullPath = resolve(rootDir, configPath);
+      const content = await readFile(fullPath, 'utf-8');
+      const config = JSON.parse(content);
+      return config as RnsecConfig;
+    } catch (error) {
+      // Continue to next config file
+    }
+  }
+
+  return null;
 }
 
 export function getFileExtension(filePath: string): string {

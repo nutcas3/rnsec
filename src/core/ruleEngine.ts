@@ -1,5 +1,5 @@
 import type { Finding } from '../types/findings.js';
-import type { Rule, RuleContext, RuleGroup } from '../types/ruleTypes.js';
+import type { Rule, RuleContext, RuleGroup, RnsecConfig } from '../types/ruleTypes.js';
 import { parseJSFile, parseJsonSafe } from './astParser.js';
 import { readFileContent } from '../utils/fileUtils.js';
 import { walkProjectFiles } from './fileWalker.js';
@@ -10,6 +10,7 @@ import { isInDebugContext } from '../utils/stringUtils.js';
  */
 export class RuleEngine {
   private ruleGroups: RuleGroup[] = [];
+  private ignoredRules: Set<string> = new Set();
 
   /**
    * Register a group of security rules
@@ -20,11 +21,27 @@ export class RuleEngine {
   }
 
   /**
-   * Get all registered rules from all rule groups
+   * Set ignored rules
+   * @param ignoredRules - Array of rule IDs to ignore
+   */
+  setIgnoredRules(ignoredRules: string[]): void {
+    this.ignoredRules = new Set(ignoredRules);
+  }
+
+  /**
+   * Get ignored rules
+   * @returns Array of ignored rule IDs
+   */
+  getIgnoredRules(): string[] {
+    return Array.from(this.ignoredRules);
+  }
+
+  /**
+   * Get all registered rules from all rule groups, excluding ignored ones
    * @returns Array of all rules
    */
   getAllRules(): Rule[] {
-    return this.ruleGroups.flatMap(group => group.rules);
+    return this.ruleGroups.flatMap(group => group.rules).filter(rule => !this.ignoredRules.has(rule.id));
   }
 
   /**
@@ -92,9 +109,7 @@ export class RuleEngine {
       return this.enrichFindingsWithDebugContext(findings, fileContent);
     } catch (error) {
       // Log error but continue scanning other files
-      if (process.env.NODE_ENV !== 'production') {
-        console.error(`Error scanning file ${filePath}:`, error);
-      }
+      console.error(`Error scanning file ${filePath}:`, error);
       return [];
     }
   }

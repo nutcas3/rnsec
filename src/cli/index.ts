@@ -23,6 +23,7 @@ import { androidRules } from '../scanners/androidScanner.js';
 import { iosRules } from '../scanners/iosScanner.js';
 import type { ScanResult } from '../types/findings.js';
 import { VERSION, DEFAULT_REPORT_FILENAMES, EXIT_CODES } from '../constants.js';
+import { readRnsecConfig } from '../utils/fileUtils.js';
 
 const securityGradient = gradient(['#ff0000', '#ff6b6b', '#ff8888']);
 
@@ -106,6 +107,15 @@ program
         }).start();
       }
 
+      // Load configuration
+      const config = await readRnsecConfig(targetPath);
+      if (config?.ignoredRules) {
+        engine.setIgnoredRules(config.ignoredRules);
+        if (config.ignoredRules.length > 0 && !options.silent) {
+          console.log(chalk.yellow(`ℹ Ignoring ${config.ignoredRules.length} rule(s): ${config.ignoredRules.join(', ')}`));
+        }
+      }
+
       registerAllRules(engine);
 
       if (spinner) {
@@ -139,6 +149,7 @@ program
         scannedFiles: scanResult.scannedFiles,
         duration,
         timestamp: new Date(),
+        ignoredRules: engine.getIgnoredRules(),
       };
 
       const htmlPath = options.html || (!options.json ? DEFAULT_REPORT_FILENAMES.HTML : null);

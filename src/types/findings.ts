@@ -22,5 +22,6 @@ export interface ScanResult {
   scannedFiles: number;
   duration: number;
   timestamp: Date;
+  ignoredRules?: string[];
 }
 
