@@ -369,6 +369,7 @@ export function isInDebugContext(content: string, snippet?: string, filePath?: s
     if (
       // Debug directories and files
       lowerPath.includes('/debug/') ||
+      lowerPath.includes('/debugoptimized/') ||
       lowerPath.includes('__debug') ||
       lowerPath.includes('.debug.') ||
       lowerPath.includes('/dev/') ||
