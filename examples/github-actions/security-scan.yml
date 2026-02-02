@@ -30,8 +30,8 @@ jobs:
         # Generate markdown report for PR comment
         rnsec scan --changed-files ${{ github.base_ref || 'main' }} --md security-report.md --silent
         
-        # Also generate HTML report for detailed analysis
-        rnsec scan --changed-files ${{ github.base_ref || 'main' }} --html security-report.html --silent
+        # Also generate HTML and JSON reports for detailed analysis and comparison
+        rnsec scan --changed-files ${{ github.base_ref || 'main' }} --html security-report.html --output rnsec-report.json --silent
       continue-on-error: true
     
     - name: Upload security reports
@@ -65,22 +65,52 @@ jobs:
               comment.body?.includes(commentIdentifier)
             );
             
+            // Extract previous scan results for comparison
+            let previousFindings = [];
             if (existingComment) {
-              // Update existing comment
+              // Parse JSON data from previous comment if available
+              const jsonMatch = existingComment.body.match(/<!-- scan-data: (.*?) -->/);
+              if (jsonMatch) {
+                try {
+                  previousFindings = JSON.parse(Buffer.from(jsonMatch[1], 'base64').toString());
+                } catch (e) {
+                  console.log('Could not parse previous scan data');
+                }
+              }
+            }
+            
+            // Add current scan data as hidden JSON for next comparison
+            let currentFindings = [];
+            try {
+              const jsonReport = JSON.parse(fs.readFileSync('rnsec-report.json', 'utf8'));
+              currentFindings = jsonReport.findings || [];
+            } catch (e) {
+              console.log('Could not read JSON report for comparison');
+            }
+            
+            // Embed scan data in comment for future comparisons
+            const scanDataComment = currentFindings.length > 0 
+              ? `\n<!-- scan-data: ${Buffer.from(JSON.stringify(currentFindings)).toString('base64')} -->`
+              : '';
+            
+            const finalReport = markdownReport + scanDataComment;
+            
+            if (existingComment) {
+              // Update existing comment with comparison
               await github.rest.issues.updateComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 comment_id: existingComment.id,
-                body: markdownReport
+                body: finalReport
               });
-              console.log('Updated existing security report comment');
+              console.log('Updated existing security report comment with comparison data');
             } else {
               // Create new comment
               await github.rest.issues.createComment({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                body: markdownReport
+                body: finalReport
               });
               console.log('Created new security report comment');
             }
